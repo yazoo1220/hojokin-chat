@@ -80,7 +80,7 @@ if not uploaded_files:
 qa_chain = configure_qa_chain(uploaded_files)
 
 if "messages" not in st.session_state or st.sidebar.button("Clear message history"):
-    st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you?"}]
+    st.session_state["messages"] = [{"role": "assistant", "content": "補助金について疑問に思うこと、なんでも聞いてくださいね！"}]
 
 for msg in st.session_state.messages:
     st.chat_message(msg["role"]).write(msg["content"])
