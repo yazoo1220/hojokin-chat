@@ -1,4 +1,4 @@
-langchian
+langchain
 streamlit
 openai
 tiktoken
