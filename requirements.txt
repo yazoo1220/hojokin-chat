@@ -1,0 +1,4 @@
+langchian
+streamlit
+openai
+tiktoken
