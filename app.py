@@ -23,7 +23,7 @@ def configure_qa_chain():
     embeddings = OpenAIEmbeddings()
     
     # Read documents
-    index_name = 'hojokin'
+    index_name = 'smaregi'
     vectordb = Pinecone.from_existing_index(index_name, embeddings)
 
     # Define retriever
