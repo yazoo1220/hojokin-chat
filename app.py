@@ -16,7 +16,7 @@ pinecone.init(
 	api_key='30efc128-4bf4-4f65-a98e-a31637789397',      
 	environment='us-east1-gcp'      
 )      
-index = pinecone.Index('hojokin')
+index = pinecone.Index('smaregi')
 
 @st.cache_resource(ttl="1h")
 def configure_qa_chain():
