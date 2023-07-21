@@ -2,4 +2,4 @@ langchain
 streamlit
 openai
 tiktoken
-pinecorn
+pinecone-client
