@@ -74,7 +74,7 @@ if "messages" not in st.session_state or st.sidebar.button("Clear message histor
 for msg in st.session_state.messages:
     st.chat_message(msg["role"]).write(msg["content"])
 
-user_query = st.chat_input(placeholder="管理画面の内容をアプリに反映したいのですがどうしたらいいですか？")
+user_query = st.chat_input(placeholder="...")
 
 if user_query:
     st.session_state.messages.append({"role": "user", "content": user_query})
