@@ -1,6 +1,7 @@
 import os
 import pinecone
 import streamlit as st
+from langchain.vectorstores import Pinecone
 from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.embeddings import OpenAIEmbeddings
