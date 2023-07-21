@@ -1,38 +1,29 @@
 import os
-import tempfile
+import pinecone
 import streamlit as st
 from langchain.chat_models import ChatOpenAI
-from langchain.document_loaders import PyPDFLoader
 from langchain.memory import ConversationBufferMemory
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.embeddings import OpenAIEmbeddings
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.chains import ConversationalRetrievalChain
-from langchain.vectorstores import DocArrayInMemorySearch
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-st.set_page_config(page_title="Balencer 補助金アドバイザー", page_icon="🦜")
-st.title("Balencer 補助金アドバイザー")
 
+st.set_page_config(page_title="Balencer 🛒 スマレジアドバイザー", page_icon="✋")
+st.title("Balencer 🛒 スマレジアドバイザー")
+
+pinecone.init(      
+	api_key='30efc128-4bf4-4f65-a98e-a31637789397',      
+	environment='us-east1-gcp'      
+)      
+index = pinecone.Index('hojokin')
 
 @st.cache_resource(ttl="1h")
-def configure_qa_chain(uploaded_files):
+def configure_qa_chain():
+    embeddings = OpenAIEmbeddings()
+    
     # Read documents
-    docs = []
-    temp_dir = tempfile.TemporaryDirectory()
-    for file in uploaded_files:
-        temp_filepath = os.path.join(temp_dir.name, file.name)
-        with open(temp_filepath, "wb") as f:
-            f.write(file.getvalue())
-        loader = PyPDFLoader(temp_filepath)
-        docs.extend(loader.load())
-
-    # Split documents
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=200)
-    splits = text_splitter.split_documents(docs)
-
-    # Create embeddings and store in vectordb
-    embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-    vectordb = DocArrayInMemorySearch.from_documents(splits, embeddings)
+    index_name = 'hojokin'
+    vectordb = Pinecone.from_existing_index(index_name, embeddings)
 
     # Define retriever
     retriever = vectordb.as_retriever(search_type="mmr", search_kwargs={"k": 2, "fetch_k": 4})
@@ -65,27 +56,24 @@ class PrintRetrievalHandler(BaseCallbackHandler):
             self.container.markdown(doc.page_content)
 
 
-openai_api_key = st.sidebar.text_input("OpenAI API Key", type="password")
-if not openai_api_key:
-    st.info("Please add your OpenAI API key to continue.")
-    st.stop()
+openai_api_key = os.environ['OPENAI_API_KEY']
 
-uploaded_files = st.sidebar.file_uploader(
-    label="Upload PDF files", type=["pdf"], accept_multiple_files=True
-)
-if not uploaded_files:
-    st.info("Please upload PDF documents to continue.")
-    st.stop()
+# uploaded_files = st.sidebar.file_uploader(
+#     label="Upload PDF files", type=["pdf"], accept_multiple_files=True
+# )
+# if not uploaded_files:
+#     st.info("Please upload PDF documents to continue.")
+#     st.stop()
 
-qa_chain = configure_qa_chain(uploaded_files)
+qa_chain = configure_qa_chain()
 
 if "messages" not in st.session_state or st.sidebar.button("Clear message history"):
-    st.session_state["messages"] = [{"role": "assistant", "content": "補助金について疑問に思うこと、なんでも聞いてくださいね！"}]
+    st.session_state["messages"] = [{"role": "assistant", "content": "スマレジについて、なんでも聞いてくださいね！"}]
 
 for msg in st.session_state.messages:
     st.chat_message(msg["role"]).write(msg["content"])
 
-user_query = st.chat_input(placeholder="Ask me anything!")
+user_query = st.chat_input(placeholder="管理画面の内容をアプリに反映したいのですがどうしたらいいですか？")
 
 if user_query:
     st.session_state.messages.append({"role": "user", "content": user_query})
